@@ -40,7 +40,7 @@ export default {
   },
   data() {
     return {
-      names: ['Alice', 'Bob', 'Charlie', 'Dave', 'Eve', 'Frank'],
+      names: ['Alexander', 'Benjamin', 'Charlotte', 'David', 'Emma', 'Friedrich', 'Gretchen', 'Hans', 'Isabelle', 'Jürgen', 'Klara', 'Lukas', 'Michaela', 'Nina', 'Oliver', 'Petra', 'Quirin', 'Rainer', 'Sabrina', 'Thomas', 'Ursula', 'Vera', 'Waldemar', 'Xenia', 'Yvonne', 'Zacharias', 'Anja', 'Brigitte', 'Christoph', 'Dieter', 'Eva', 'Franz', 'Gisela', 'Hannah', 'Ingrid', 'Jakob', 'Klaus', 'Lea', 'Martin', 'Nico', 'Olaf', 'Paula'],
       rotationId: 0,
       usedRotationIds: [],
       showPopup: false,
@@ -71,11 +71,11 @@ export default {
       this.increaseRotationId();
     },
     spin() {
-      const rotations = Math.floor(Math.random() * this.names.length);
+      const rotations = Math.floor(Math.random() * this.names.length) + this.names.length;
       for (let i = 0; i < rotations; i++) {
         setTimeout(() => {
           this.shiftNames();
-        }, ((1 - Math.cos((i/rotations) * Math.PI)) / 2) * 600);
+        }, (Math.pow(Math.tan((i/rotations)), 2) + Math.tan((i/rotations))) * 500);
       }
     },
     toggleUsedRotationId() {

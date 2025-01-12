@@ -1,12 +1,11 @@
 <template>
   <div class="center">
     <div>
-      <button @click="showPopup = true">&#9998;</button> <!-- Open the popup -->
+      <button @click="showPopup = true">&#9998;</button>
       <button :class="{ used: rotationIdIsUsed }" @click="toggleUsedRotationId">{{ rotationId }}</button> <!-- Conditional class binding -->
-      <button @click="shiftNames">&#8634;</button>
+      <button @click="spin">&#8634;</button>
     </div>
 
-    <!-- Popup for entering names -->
     <div v-if="showPopup" class="popup" @click="showPopup = false">
       <div class="popup-content" @click="(e) => e.stopPropagation()">
         <h3>Namen</h3>
@@ -44,8 +43,8 @@ export default {
       names: ['Alice', 'Bob', 'Charlie', 'Dave', 'Eve', 'Frank'],
       rotationId: 0,
       usedRotationIds: [],
-      showPopup: false, // Control the popup visibility
-      namesInput: '' // Model for the names input in the popup
+      showPopup: false,
+      namesInput: ''
     };
   },
   computed: {
@@ -54,7 +53,7 @@ export default {
     },
     secondHalfReversed() {
       const secondHalf = this.names.slice(Math.floor(this.names.length / 2));
-      return secondHalf.reverse(); // Reverse the second half
+      return secondHalf.reverse();
     },
     rotationIdIsUsed() {
       return this.usedRotationIds.includes(this.rotationId);
@@ -66,10 +65,18 @@ export default {
     },
     shiftNames() {
       if (this.names.length > 2) {
-        const lastItem = this.names.pop(); // Remove the last item
-        this.names.splice(1, 0, lastItem); // Insert the last item at the second position
+        const lastItem = this.names.pop();
+        this.names.splice(1, 0, lastItem);
       }
       this.increaseRotationId();
+    },
+    spin() {
+      this.rotationId = Math.floor(Math.random() * this.names.length) + Math.floor(Math.random() * 5);
+      for (let i = 0; i < this.rotationId; i++) {
+        setTimeout(() => {
+          this.shiftNames();
+        }, 100 * i);
+      }
     },
     toggleUsedRotationId() {
       if (this.rotationIdIsUsed) {
@@ -84,19 +91,19 @@ export default {
       const maxLength = Math.max(this.firstHalf.length, this.secondHalfReversed.length);
 
       for (let i = 0; i < maxLength; i++) {
-        const secondHalfName = this.secondHalfReversed[i] || ''; // Handle cases where one list is longer
+        const secondHalfName = this.secondHalfReversed[i] || '';
         const firstHalfName = this.firstHalf[i] || '';
         formattedText += `${secondHalfName} - ${firstHalfName}\n`;
       }
 
-      // Copy the formatted string to clipboard
       navigator.clipboard.writeText(formattedText).then(() => {
         console.log('Copied to clipboard');
       });
     },
     submitNames() {
-      this.names = this.namesInput.split(',').map(name => name.trim()).filter(name => name !== '');
-      this.showPopup = false; // Close the popup after submitting
+      this.names = this.namesInput.split(/[\s,]+/).map(name => name.trim()).filter(name => name !== '');
+      this.usedRotationIds = [];
+      this.showPopup = false;
     }
   }
 };
@@ -122,6 +129,8 @@ li {
   border: 1px solid #ddd;
   margin: 5px 2px;
   width: 100px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 button {
   margin: 20px 10px 10px 10px;
@@ -140,7 +149,7 @@ button:hover {
   background-color: #369870;
 }
 button.used {
-  background-color: red; /* Apply red color when used */
+  background-color: red;
 }
 .center {
   display: flex;
@@ -172,7 +181,8 @@ button.used {
   text-align: center;
 }
 textarea {
-  width: 100%;
+  resize: none;
+  width: calc(100% - 20px);
   height: 100px;
   margin: 10px 0;
   padding: 10px;

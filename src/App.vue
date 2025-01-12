@@ -20,7 +20,7 @@ setsStore.loadFromLocalStorage()
       <Persons />
 
       <div class="column">
-        <h1>Filter</h1>
+        <h1>Filter!</h1>
         <div>
           <button>Gebieten</button>
           <button>Verbieten</button>

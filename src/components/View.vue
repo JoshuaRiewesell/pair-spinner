@@ -11,7 +11,7 @@ function copyView() {
 
 <template>
   <div class="column">
-    <h1>Ansicht</h1>
+    <h1>Ansicht!</h1>
     <button @click="copyView()">Copy</button>
     <ul>
       <li v-for="(pair, index) in viewStore.setOfPairs.pairs" :key="index" class="item">

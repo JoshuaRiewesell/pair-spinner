@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="center">
     <div>
       <button @click="showPopup = true">&#9998;</button> <!-- Open the popup -->
       <button :class="{ used: rotationIdIsUsed }" @click="toggleUsedRotationId">{{ rotationId }}</button> <!-- Conditional class binding -->
@@ -103,6 +103,11 @@ export default {
 </script>
 
 <style scoped>
+p, h1, h2, h3, ul, li {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
 h3 {
   margin: 40px 0 0;
 }
@@ -136,6 +141,12 @@ button:hover {
 }
 button.used {
   background-color: red; /* Apply red color when used */
+}
+.center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .table {
   display: flex;

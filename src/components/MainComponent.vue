@@ -2,7 +2,7 @@
   <div class="center">
     <div>
       <button @click="showPopup = true">&#9998;</button>
-      <button :class="{ used: rotationIdIsUsed }" @click="toggleUsedRotationId">{{ rotationId }}</button> <!-- Conditional class binding -->
+      <button :class="{ used: rotationIdIsUsed }" @click="toggleUsedRotationId">{{ rotationId }}</button>
       <button @click="spin">&#8634;</button>
     </div>
 
@@ -19,12 +19,12 @@
 
     <div class="table">
       <ul>
-        <li v-for="(name, index) in secondHalfReversed" :key="index">
+        <li v-for="(name, index) in secondHalfReversed" :key="index" :style="getColorStyle(name)">
           {{ name }}
         </li>
       </ul>
       <ul>
-        <li v-for="(name, index) in firstHalf" :key="index">
+        <li v-for="(name, index) in firstHalf" :key="index" :style="getColorStyle(name)">
           {{ name }}
         </li>
       </ul>
@@ -71,11 +71,11 @@ export default {
       this.increaseRotationId();
     },
     spin() {
-      this.rotationId = Math.floor(Math.random() * this.names.length) + Math.floor(Math.random() * 5);
-      for (let i = 0; i < this.rotationId; i++) {
+      const rotations = Math.floor(Math.random() * this.names.length);
+      for (let i = 0; i < rotations; i++) {
         setTimeout(() => {
           this.shiftNames();
-        }, 100 * i);
+        }, ((1 - Math.cos((i/rotations) * Math.PI)) / 2) * 600);
       }
     },
     toggleUsedRotationId() {
@@ -104,6 +104,28 @@ export default {
       this.names = this.namesInput.split(/[\s,]+/).map(name => name.trim()).filter(name => name !== '');
       this.usedRotationIds = [];
       this.showPopup = false;
+    },
+    hashCode(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      return hash;
+    },
+    rgbFromHash(hash) {
+      // Map the hash value to RGB values
+      const r = (hash >> 16) & 0xAA;
+      const g = (hash >> 8) & 0xAA;
+      const b = hash & 0xAA;
+      return `rgb(${r}, ${g}, ${b})`;
+    },
+    getColorStyle(name) {
+      const hash = this.hashCode(name);
+      const color = this.rgbFromHash(hash);
+      return {
+        backgroundColor: color
+      };
     }
   }
 };
@@ -131,10 +153,12 @@ li {
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: white;
+  text-align: center;
+  font-weight: 600;
 }
 button {
   margin: 20px 10px 10px 10px;
-  padding: 5px 10px;
   background-color: #42b983;
   color: white;
   border: none;

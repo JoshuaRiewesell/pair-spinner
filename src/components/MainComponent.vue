@@ -40,9 +40,9 @@ export default {
   },
   data() {
     return {
-      names: ['Alexander', 'Benjamin', 'Charlotte', 'David', 'Emma', 'Friedrich', 'Gretchen', 'Hans', 'Isabelle', 'Jürgen', 'Klara', 'Lukas', 'Michaela', 'Nina', 'Oliver', 'Petra', 'Quirin', 'Rainer', 'Sabrina', 'Thomas', 'Ursula', 'Vera', 'Waldemar', 'Xenia', 'Yvonne', 'Zacharias', 'Anja', 'Brigitte', 'Christoph', 'Dieter', 'Eva', 'Franz', 'Gisela', 'Hannah', 'Ingrid', 'Jakob', 'Klaus', 'Lea', 'Martin', 'Nico', 'Olaf', 'Paula'],
+      names: JSON.parse(localStorage.getItem('names')) || ['Alexander', 'Benjamin', 'Charlotte', 'David', 'Emma', 'Friedrich', 'Gretchen', 'Hans', 'Isabelle', 'Jürgen', 'Klara', 'Lukas', 'Michaela', 'Nina', 'Oliver', 'Petra', 'Quirin', 'Rainer', 'Sabrina', 'Thomas', 'Ursula', 'Vera', 'Waldemar', 'Xenia', 'Yvonne', 'Zacharias', 'Anja', 'Brigitte', 'Christoph', 'Dieter', 'Eva', 'Franz', 'Gisela', 'Hannah', 'Ingrid', 'Jakob', 'Klaus', 'Lea', 'Martin', 'Nico', 'Olaf', 'Paula'],
       rotationId: 0,
-      usedRotationIds: [],
+      usedRotationIds: JSON.parse(localStorage.getItem('usedRotationIds')) || [],
       showPopup: false,
       namesInput: ''
     };
@@ -85,6 +85,7 @@ export default {
         this.usedRotationIds.push(this.rotationId);
         this.copyToClipboard();
       }
+      localStorage.setItem('usedRotationIds', JSON.stringify(this.usedRotationIds));
     },
     copyToClipboard() {
       let formattedText = '';
@@ -96,13 +97,13 @@ export default {
         formattedText += `${secondHalfName} - ${firstHalfName}\n`;
       }
 
-      navigator.clipboard.writeText(formattedText).then(() => {
-        console.log('Copied to clipboard');
-      });
+      navigator.clipboard.writeText(formattedText);
     },
     submitNames() {
       this.names = this.namesInput.split(/[\s,]+/).map(name => name.trim()).filter(name => name !== '');
       this.usedRotationIds = [];
+      localStorage.setItem('names', JSON.stringify(this.names));
+      localStorage.setItem('usedRotationIds', JSON.stringify(this.usedRotationIds));
       this.showPopup = false;
     },
     hashCode(str) {

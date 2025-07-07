@@ -25,6 +25,10 @@
         </template>
       </div>
     </div>
+    <!-- Settings Button (fixed to bottom left of viewport) -->
+    <button class="settings-btn" @click="showSettings = true" title="Einstellungen">
+      &#9881;
+    </button>
     <div class="center">
       <div>
         <button @click="openNamesPopup">&#9998;</button>
@@ -44,6 +48,18 @@
           <div class="popup-buttons">
             <button @click="showPopup = false">X</button>
             <button @click="submitNames">&#10003;</button>
+          </div>
+        </div>
+      </div>
+      <!-- Settings Popup -->
+      <div v-if="showSettings" class="popup" @click="showSettings = false">
+        <div class="popup-content" @click="(e) => e.stopPropagation()">
+          <h3>Spinner-Geschwindigkeit</h3>
+          <div style="margin: 30px 0 20px 0;">
+            <input type="range" min="0.1" max="2" step="0.1" v-model.number="spinnerSpeed" @input="saveSpinnerSpeed" />
+          </div>
+          <div class="popup-buttons">
+            <button @click="showSettings = false">OK</button>
           </div>
         </div>
       </div>
@@ -90,11 +106,13 @@ export default {
       rotationId: 0,
       usedRotationIds: JSON.parse(localStorage.getItem('usedRotationIds')) || [],
       showPopup: false,
+      showSettings: false,
       namesInput: '',
       sidebarText: localStorage.getItem('sidebarText') || '',
       sidebarTextareaWidth: localStorage.getItem('sidebarTextareaWidth') || '96%',
       sidebarTextareaHeight: localStorage.getItem('sidebarTextareaHeight') || '120px',
       isSpinningActive: false,
+      spinnerSpeed: Number(localStorage.getItem('spinnerSpeed')) || 5,
     };
   },
   computed: {
@@ -176,7 +194,7 @@ export default {
             localStorage.setItem('rotationId', this.rotationId);
             this.isSpinningActive = false;
           }
-        }, (Math.pow(Math.tan((i/rotations)), 2) + Math.tan((i/rotations))) * 500);
+        }, ((Math.pow(Math.tan((i/rotations)), 2) + Math.tan((i/rotations))) * (500 / this.spinnerSpeed)));
       }
     },
     toggleUsedRotationId() {
@@ -243,6 +261,9 @@ export default {
     setRotationId(id) {
       this.rotationId = id;
       localStorage.setItem('rotationId', this.rotationId);
+    },
+    saveSpinnerSpeed() {
+      localStorage.setItem('spinnerSpeed', this.spinnerSpeed);
     }
   },
   mounted() {
@@ -430,6 +451,28 @@ textarea {
 .reverse-list {
   display: flex;
   flex-direction: column-reverse;
+}
+.settings-btn {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  line-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1002;
+}
+.settings-btn:hover {
+  background-color: #369870;
 }
 </style>
 

@@ -29,7 +29,11 @@
       <div>
         <button @click="openNamesPopup">&#9998;</button>
         <button :class="{ used: rotationIdIsUsed }" @click="toggleUsedRotationId">{{ rotationId }}</button>
-        <button @click="spin">&#8634;</button>
+        <button 
+          @click="spin"
+        >
+          <span :class="{ 'spin-rotate-ccw': isSpinningActive }">&#8634;</span>
+        </button>
       </div>
 
       <div v-if="showPopup" class="popup" @click="showPopup = false">
@@ -90,6 +94,7 @@ export default {
       sidebarText: localStorage.getItem('sidebarText') || '',
       sidebarTextareaWidth: localStorage.getItem('sidebarTextareaWidth') || '96%',
       sidebarTextareaHeight: localStorage.getItem('sidebarTextareaHeight') || '120px',
+      isSpinningActive: false,
     };
   },
   computed: {
@@ -152,6 +157,7 @@ export default {
     },
     spin() {
       const rotations = Math.floor(Math.random() * this.names.length) + this.names.length;
+      this.isSpinningActive = true;
       for (let i = 0; i < rotations; i++) {
         setTimeout(() => {
           this.shiftNames();
@@ -165,6 +171,7 @@ export default {
               tries++;
             }
             localStorage.setItem('rotationId', this.rotationId);
+            this.isSpinningActive = false;
           }
         }, (Math.pow(Math.tan((i/rotations)), 2) + Math.tan((i/rotations))) * 500);
       }
@@ -428,6 +435,14 @@ textarea {
 }
 .used-rotation-ids button.active {
   /* keine grüne Hervorhebung mehr */
+}
+@keyframes spin-ccw {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+.spin-rotate-ccw {
+  display: inline-block;
+  animation: spin-ccw 0.7s linear infinite;
 }
 </style>
 

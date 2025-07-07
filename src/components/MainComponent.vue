@@ -120,6 +120,7 @@ export default {
   methods: {
     increaseRotationId() {
       this.rotationId = (this.rotationId + 1) % (this.names.length - 1);
+      localStorage.setItem('rotationId', this.rotationId);
     },
     shiftNames() {
       if (this.names.length > 2) {
@@ -127,6 +128,7 @@ export default {
         this.names.splice(1, 0, lastItem);
       }
       this.increaseRotationId();
+      localStorage.setItem('rotationId', this.rotationId);
     },
     spin() {
       const rotations = Math.floor(Math.random() * this.names.length) + this.names.length;
@@ -170,9 +172,18 @@ export default {
         .map(name => name.trim())
         .filter(name => name !== '');
       this.usedRotationIds = [];
+      this.rotationId = 0;
       localStorage.setItem('names', JSON.stringify(this.names));
       localStorage.setItem('usedRotationIds', JSON.stringify(this.usedRotationIds));
+      localStorage.setItem('rotationId', this.rotationId);
       this.showPopup = false;
+      // Nach dem Setzen: Namen entsprechend rotationId rotieren
+      for (let i = 0; i < this.rotationId; i++) {
+        if (this.names.length > 1) {
+          const lastItem = this.names.pop();
+          this.names.splice(1, 0, lastItem);
+        }
+      }
     },
     saveSidebarText() {
       localStorage.setItem('sidebarText', this.sidebarText);
@@ -221,6 +232,17 @@ export default {
     this.sidebarText = localStorage.getItem('sidebarText') || '';
     this.sidebarTextareaWidth = localStorage.getItem('sidebarTextareaWidth') || '96%';
     this.sidebarTextareaHeight = localStorage.getItem('sidebarTextareaHeight') || '120px';
+    const storedRotationId = localStorage.getItem('rotationId');
+    if (storedRotationId !== null) {
+      this.rotationId = parseInt(storedRotationId, 10);
+    }
+    // Nach dem Laden: Namen entsprechend rotationId rotieren
+    for (let i = 0; i < this.rotationId; i++) {
+      if (this.names.length > 1) {
+        const lastItem = this.names.pop();
+        this.names.splice(1, 0, lastItem);
+      }
+    }
   }
 };
 </script>

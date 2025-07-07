@@ -1,46 +1,61 @@
 <template>
-  <div class="center">
-    <div>
-      <button @click="showPopup = true">&#9998;</button>
-      <button :class="{ used: rotationIdIsUsed }" @click="toggleUsedRotationId">{{ rotationId }}</button>
-      <button @click="spin">&#8634;</button>
+  <div class="main-layout">
+    <div class="left-sidebar">
+      <!-- Textfield that saves its value to localStorage on every update -->
+      <textarea
+        v-model="sidebarText"
+        @input="saveSidebarText"
+        placeholder="Sidebar Text..."
+        :style="sidebarTextareaStyle"
+        ref="sidebarTextarea"
+        @mouseup="handleTextareaResize"
+        @mouseleave="handleTextareaResize"
+        rows="6"
+      ></textarea>
     </div>
+    <div class="center">
+      <div>
+        <button @click="showPopup = true">&#9998;</button>
+        <button :class="{ used: rotationIdIsUsed }" @click="toggleUsedRotationId">{{ rotationId }}</button>
+        <button @click="spin">&#8634;</button>
+      </div>
 
-    <div v-if="showPopup" class="popup" @click="showPopup = false">
-      <div class="popup-content" @click="(e) => e.stopPropagation()">
-        <h3>Namen</h3>
-        <textarea v-model="namesInput" placeholder="Trenne die Namen mit Kommas und/oder Absätzen"></textarea>
-        <div class="popup-buttons">
-          <button @click="showPopup = false">X</button>
-          <button @click="submitNames">&#10003;</button>
+      <div v-if="showPopup" class="popup" @click="showPopup = false">
+        <div class="popup-content" @click="(e) => e.stopPropagation()">
+          <h3>Namen</h3>
+          <textarea v-model="namesInput" placeholder="Trenne die Namen mit Kommas und/oder Absätzen"></textarea>
+          <div class="popup-buttons">
+            <button @click="showPopup = false">X</button>
+            <button @click="submitNames">&#10003;</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="table">
-      <div class="pair-list-row">
-        <ul>
-          <li v-for="(name, index) in splitNames[0]" :key="'l1-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
-        </ul>
-        <ul>
-          <li v-for="(name, index) in splitNames[1]" :key="'l2-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
-        </ul>
-      </div>
-      <div class="pair-list-row">
-        <ul>
-          <li v-for="(name, index) in splitNames[2]" :key="'l3-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
-        </ul>
-        <ul>
-          <li v-for="(name, index) in splitNames[3]" :key="'l4-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
-        </ul>
-      </div>
-      <div class="pair-list-row">
-        <ul>
-          <li v-for="(name, index) in splitNames[4]" :key="'l5-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
-        </ul>
-        <ul>
-          <li v-for="(name, index) in splitNames[5]" :key="'l6-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
-        </ul>
+      <div class="table">
+        <div class="pair-list-row">
+          <ul>
+            <li v-for="(name, index) in splitNames[0]" :key="'l1-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          </ul>
+          <ul>
+            <li v-for="(name, index) in splitNames[1]" :key="'l2-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          </ul>
+        </div>
+        <div class="pair-list-row">
+          <ul>
+            <li v-for="(name, index) in splitNames[2]" :key="'l3-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          </ul>
+          <ul>
+            <li v-for="(name, index) in splitNames[3]" :key="'l4-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          </ul>
+        </div>
+        <div class="pair-list-row">
+          <ul>
+            <li v-for="(name, index) in splitNames[4]" :key="'l5-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          </ul>
+          <ul>
+            <li v-for="(name, index) in splitNames[5]" :key="'l6-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -58,7 +73,10 @@ export default {
       rotationId: 0,
       usedRotationIds: JSON.parse(localStorage.getItem('usedRotationIds')) || [],
       showPopup: false,
-      namesInput: ''
+      namesInput: '',
+      sidebarText: localStorage.getItem('sidebarText') || '',
+      sidebarTextareaWidth: localStorage.getItem('sidebarTextareaWidth') || '96%',
+      sidebarTextareaHeight: localStorage.getItem('sidebarTextareaHeight') || '120px',
     };
   },
   computed: {
@@ -79,6 +97,21 @@ export default {
     },
     rotationIdIsUsed() {
       return this.usedRotationIds.includes(this.rotationId);
+    },
+    sidebarTextareaStyle() {
+      return {
+        width: this.sidebarTextareaWidth,
+        height: this.sidebarTextareaHeight,
+        margin: '10px',
+        padding: '12px',
+        borderRadius: '6px',
+        border: '1px solid #ccc',
+        fontSize: '18px',
+        boxSizing: 'border-box',
+        resize: 'both',
+        textAlign: 'left',
+        verticalAlign: 'top',
+      };
     }
   },
   methods: {
@@ -138,6 +171,22 @@ export default {
       localStorage.setItem('usedRotationIds', JSON.stringify(this.usedRotationIds));
       this.showPopup = false;
     },
+    saveSidebarText() {
+      localStorage.setItem('sidebarText', this.sidebarText);
+    },
+    handleTextareaResize() {
+      this.$nextTick(() => {
+        const el = this.$refs.sidebarTextarea;
+        if (el) {
+          const width = el.style.width || el.offsetWidth + 'px';
+          const height = el.style.height || el.offsetHeight + 'px';
+          this.sidebarTextareaWidth = width;
+          this.sidebarTextareaHeight = height;
+          localStorage.setItem('sidebarTextareaWidth', width);
+          localStorage.setItem('sidebarTextareaHeight', height);
+        }
+      });
+    },
     hashCode(str) {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
@@ -163,6 +212,12 @@ export default {
     formatName(name) {
       return name.replace(/ /g, '<br>');
     }
+  },
+  mounted() {
+    // Ensure sidebarText is loaded from localStorage on mount (in case of reactivity issues)
+    this.sidebarText = localStorage.getItem('sidebarText') || '';
+    this.sidebarTextareaWidth = localStorage.getItem('sidebarTextareaWidth') || '96%';
+    this.sidebarTextareaHeight = localStorage.getItem('sidebarTextareaHeight') || '120px';
   }
 };
 </script>
@@ -263,5 +318,21 @@ textarea {
   display: flex;
   flex-direction: row;
   margin: 0 32px;
+}
+.main-layout {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  align-items: flex-start;
+}
+.left-sidebar {
+  min-width: 180px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 20px;
+  height: auto;
+  flex-shrink: 0;
 }
 </style>

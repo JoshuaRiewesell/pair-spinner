@@ -1,11 +1,12 @@
 <template>
   <div class="main-layout">
     <div class="left-sidebar">
+      <h1>Zweierschaften</h1>
       <!-- Textfield that saves its value to localStorage on every update -->
       <textarea
         v-model="sidebarText"
         @input="saveSidebarText"
-        placeholder="Sidebar Text..."
+        placeholder="Bibelstelle..."
         :style="sidebarTextareaStyle"
         ref="sidebarTextarea"
         @mouseup="handleTextareaResize"
@@ -105,8 +106,10 @@ export default {
         margin: '10px',
         padding: '12px',
         borderRadius: '6px',
-        border: '1px solid #ccc',
-        fontSize: '18px',
+        border: '1px solid #1a2233',
+        fontSize: '22px',
+        color: '#e0e6ed',
+        background: '#101726',
         boxSizing: 'border-box',
         resize: 'both',
         textAlign: 'left',
@@ -239,8 +242,7 @@ ul {
 }
 li {
   padding: 10px;
-  border: 1px solid #ddd;
-  margin: 5px 2px;
+  margin: 5px 5px;
   width: 120px;
   height: 50px;
   border-radius: 10px;
@@ -334,5 +336,20 @@ textarea {
   padding-top: 20px;
   height: auto;
   flex-shrink: 0;
+  color: #e0e6ed;
+}
+.left-sidebar h1 {
+  font-size: 2.5rem;
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  color: #f5f6fa;
+  margin: 0 0 14px 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+</style>
+
+<style>
+body {
+  background: linear-gradient(135deg, #0a0f18 0%, #151c28 100%);
 }
 </style>

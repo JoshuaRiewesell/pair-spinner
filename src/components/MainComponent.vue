@@ -53,24 +53,24 @@
           <ul>
             <li v-for="(name, index) in splitNames[0]" :key="'l1-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
           </ul>
-          <ul>
-            <li v-for="(name, index) in splitNames[1]" :key="'l2-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          <ul class="reverse-list">
+            <li v-for="(name, index) in splitNames[5]" :key="'l2-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
           </ul>
         </div>
         <div class="pair-list-row">
           <ul>
-            <li v-for="(name, index) in splitNames[2]" :key="'l3-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+            <li v-for="(name, index) in splitNames[1]" :key="'l3-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
           </ul>
-          <ul>
-            <li v-for="(name, index) in splitNames[3]" :key="'l4-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          <ul class="reverse-list">
+            <li v-for="(name, index) in splitNames[4]" :key="'l4-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
           </ul>
         </div>
         <div class="pair-list-row">
           <ul>
-            <li v-for="(name, index) in splitNames[4]" :key="'l5-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+            <li v-for="(name, index) in splitNames[2]" :key="'l5-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
           </ul>
-          <ul>
-            <li v-for="(name, index) in splitNames[5]" :key="'l6-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+          <ul class="reverse-list">
+            <li v-for="(name, index) in splitNames[3]" :key="'l6-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
           </ul>
         </div>
       </div>
@@ -99,11 +99,14 @@ export default {
   },
   computed: {
     rotatedNames() {
-      if (!this.names.length || this.rotationId === 0) return this.names;
-      // Rotiert die Namen entsprechend rotationId
-      const n = this.names.length;
+      if (!this.names.length) return this.names;
+      if (this.names.length < 2 || this.rotationId === 0) return this.names;
+      const first = this.names[0];
+      const rest = this.names.slice(1);
+      const n = rest.length;
       const id = this.rotationId % n;
-      return this.names.slice(id).concat(this.names.slice(0, id));
+      const rotatedRest = rest.slice(id).concat(rest.slice(0, id));
+      return [first, ...rotatedRest];
     },
     splitNames() {
       // Teilt die rotierten Namen in 6 möglichst gleich große Listen auf
@@ -181,28 +184,8 @@ export default {
         this.usedRotationIds = this.usedRotationIds.filter(id => id !== this.rotationId);
       } else {
         this.usedRotationIds.push(this.rotationId);
-        this.copyToClipboard();
       }
       localStorage.setItem('usedRotationIds', JSON.stringify(this.usedRotationIds));
-    },
-    copyToClipboard() {
-      let formattedText = '';
-      const lists = this.splitNames;
-      const maxLength = Math.max(
-        lists[0].length,
-        lists[1].length,
-        lists[2].length,
-        lists[3].length,
-        lists[4].length,
-        lists[5].length
-      );
-      for (let i = 0; i < maxLength; i++) {
-        const p1 = `${lists[0][i] || ''} - ${lists[1][i] || ''}`;
-        const p2 = `${lists[2][i] || ''} - ${lists[3][i] || ''}`;
-        const p3 = `${lists[4][i] || ''} - ${lists[5][i] || ''}`;
-        formattedText += `${p1}\t${p2}\t${p3}\n`;
-      }
-      navigator.clipboard.writeText(formattedText);
     },
     submitNames() {
       this.names = this.namesInput
@@ -443,6 +426,10 @@ textarea {
 .spin-rotate-ccw {
   display: inline-block;
   animation: spin-ccw 0.7s linear infinite;
+}
+.reverse-list {
+  display: flex;
+  flex-direction: column-reverse;
 }
 </style>
 

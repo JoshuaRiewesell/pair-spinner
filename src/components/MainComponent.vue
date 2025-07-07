@@ -18,12 +18,30 @@
     </div>
 
     <div class="table">
-      <ul>
-        <li v-for="(name, index) in secondHalfReversed" :key="index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
-      </ul>
-      <ul>
-        <li v-for="(name, index) in firstHalf" :key="index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
-      </ul>
+      <div class="pair-list-row">
+        <ul>
+          <li v-for="(name, index) in splitNames[0]" :key="'l1-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+        </ul>
+        <ul>
+          <li v-for="(name, index) in splitNames[1]" :key="'l2-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+        </ul>
+      </div>
+      <div class="pair-list-row">
+        <ul>
+          <li v-for="(name, index) in splitNames[2]" :key="'l3-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+        </ul>
+        <ul>
+          <li v-for="(name, index) in splitNames[3]" :key="'l4-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+        </ul>
+      </div>
+      <div class="pair-list-row">
+        <ul>
+          <li v-for="(name, index) in splitNames[4]" :key="'l5-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+        </ul>
+        <ul>
+          <li v-for="(name, index) in splitNames[5]" :key="'l6-' + index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -44,12 +62,20 @@ export default {
     };
   },
   computed: {
-    firstHalf() {
-      return this.names.slice(0, Math.floor(this.names.length / 2));
-    },
-    secondHalfReversed() {
-      const secondHalf = this.names.slice(Math.floor(this.names.length / 2));
-      return secondHalf.reverse();
+    splitNames() {
+      // Teilt die Namen in 6 möglichst gleich große Listen auf
+      const result = [[], [], [], [], [], []];
+      const baseSize = Math.floor(this.names.length / 6);
+      let rest = this.names.length % 6;
+      let idx = 0;
+      let nameIdx = 0;
+      for (let i = 0; i < 6; i++) {
+        const size = baseSize + (rest > 0 ? 1 : 0);
+        rest--;
+        result[i] = this.names.slice(nameIdx, nameIdx + size);
+        nameIdx += size;
+      }
+      return result;
     },
     rotationIdIsUsed() {
       return this.usedRotationIds.includes(this.rotationId);
@@ -85,14 +111,21 @@ export default {
     },
     copyToClipboard() {
       let formattedText = '';
-      const maxLength = Math.max(this.firstHalf.length, this.secondHalfReversed.length);
-
+      const lists = this.splitNames;
+      const maxLength = Math.max(
+        lists[0].length,
+        lists[1].length,
+        lists[2].length,
+        lists[3].length,
+        lists[4].length,
+        lists[5].length
+      );
       for (let i = 0; i < maxLength; i++) {
-        const secondHalfName = this.secondHalfReversed[i] || '';
-        const firstHalfName = this.firstHalf[i] || '';
-        formattedText += `${secondHalfName} - ${firstHalfName}\n`;
+        const p1 = `${lists[0][i] || ''} - ${lists[1][i] || ''}`;
+        const p2 = `${lists[2][i] || ''} - ${lists[3][i] || ''}`;
+        const p3 = `${lists[4][i] || ''} - ${lists[5][i] || ''}`;
+        formattedText += `${p1}\t${p2}\t${p3}\n`;
       }
-
       navigator.clipboard.writeText(formattedText);
     },
     submitNames() {
@@ -225,5 +258,10 @@ textarea {
 }
 .popup-buttons button {
   margin: 5px;
+}
+.pair-list-row {
+  display: flex;
+  flex-direction: row;
+  margin: 0 32px;
 }
 </style>

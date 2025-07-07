@@ -19,14 +19,10 @@
 
     <div class="table">
       <ul>
-        <li v-for="(name, index) in secondHalfReversed" :key="index" :style="getColorStyle(name)">
-          {{ name }}
-        </li>
+        <li v-for="(name, index) in secondHalfReversed" :key="index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
       </ul>
       <ul>
-        <li v-for="(name, index) in firstHalf" :key="index" :style="getColorStyle(name)">
-          {{ name }}
-        </li>
+        <li v-for="(name, index) in firstHalf" :key="index" :style="getColorStyle(name)" v-html="formatName(name)"></li>
       </ul>
     </div>
   </div>
@@ -40,7 +36,7 @@ export default {
   },
   data() {
     return {
-      names: JSON.parse(localStorage.getItem('names')) || ['Alexander', 'Benjamin', 'Charlotte', 'David', 'Emma', 'Friedrich', 'Gretchen', 'Hans', 'Isabelle', 'Jürgen', 'Klara', 'Lukas', 'Michaela', 'Nina', 'Oliver', 'Petra', 'Quirin', 'Rainer', 'Sabrina', 'Thomas', 'Ursula', 'Vera', 'Waldemar', 'Xenia', 'Yvonne', 'Zacharias', 'Anja', 'Brigitte', 'Christoph', 'Dieter', 'Eva', 'Franz', 'Gisela', 'Hannah', 'Ingrid', 'Jakob', 'Klaus', 'Lea', 'Martin', 'Nico', 'Olaf', 'Paula'],
+      names: JSON.parse(localStorage.getItem('names')) || [],
       rotationId: 0,
       usedRotationIds: JSON.parse(localStorage.getItem('usedRotationIds')) || [],
       showPopup: false,
@@ -100,7 +96,10 @@ export default {
       navigator.clipboard.writeText(formattedText);
     },
     submitNames() {
-      this.names = this.namesInput.split(/[\s,]+/).map(name => name.trim()).filter(name => name !== '');
+      this.names = this.namesInput
+        .split(/[\n,]+/)
+        .map(name => name.trim())
+        .filter(name => name !== '');
       this.usedRotationIds = [];
       localStorage.setItem('names', JSON.stringify(this.names));
       localStorage.setItem('usedRotationIds', JSON.stringify(this.usedRotationIds));
@@ -127,6 +126,9 @@ export default {
       return {
         backgroundColor: color
       };
+    },
+    formatName(name) {
+      return name.replace(/ /g, '<br>');
     }
   }
 };
@@ -151,12 +153,18 @@ li {
   padding: 10px;
   border: 1px solid #ddd;
   margin: 5px 2px;
-  width: 100px;
+  width: 120px;
+  height: 50px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: white;
   text-align: center;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 button {
   margin: 20px 10px 10px 10px;

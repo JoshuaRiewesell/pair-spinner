@@ -13,6 +13,17 @@
         @mouseleave="handleTextareaResize"
         rows="6"
       ></textarea>
+      <!-- Used Rotation IDs Button List -->
+      <div class="used-rotation-ids">
+        <template v-for="(id, idx) in usedRotationIds" :key="'used-id-' + id">
+          <button
+            class="used"
+            @click="setRotationId(id)"
+          >
+            {{ id }}
+          </button>
+        </template>
+      </div>
     </div>
     <div class="center">
       <div>
@@ -81,17 +92,24 @@ export default {
     };
   },
   computed: {
+    rotatedNames() {
+      if (!this.names.length || this.rotationId === 0) return this.names;
+      // Rotiert die Namen entsprechend rotationId
+      const n = this.names.length;
+      const id = this.rotationId % n;
+      return this.names.slice(id).concat(this.names.slice(0, id));
+    },
     splitNames() {
-      // Teilt die Namen in 6 möglichst gleich große Listen auf
+      // Teilt die rotierten Namen in 6 möglichst gleich große Listen auf
+      const names = this.rotatedNames;
       const result = [[], [], [], [], [], []];
-      const baseSize = Math.floor(this.names.length / 6);
-      let rest = this.names.length % 6;
-      let idx = 0;
+      const baseSize = Math.floor(names.length / 6);
+      let rest = names.length % 6;
       let nameIdx = 0;
       for (let i = 0; i < 6; i++) {
         const size = baseSize + (rest > 0 ? 1 : 0);
         rest--;
-        result[i] = this.names.slice(nameIdx, nameIdx + size);
+        result[i] = names.slice(nameIdx, nameIdx + size);
         nameIdx += size;
       }
       return result;
@@ -119,22 +137,30 @@ export default {
   },
   methods: {
     increaseRotationId() {
+      if (this.names.length < 2) return;
       this.rotationId = (this.rotationId + 1) % (this.names.length - 1);
       localStorage.setItem('rotationId', this.rotationId);
     },
     shiftNames() {
-      if (this.names.length > 2) {
-        const lastItem = this.names.pop();
-        this.names.splice(1, 0, lastItem);
-      }
+      // Nur RotationId erhöhen, keine Namen verschieben
       this.increaseRotationId();
-      localStorage.setItem('rotationId', this.rotationId);
     },
     spin() {
       const rotations = Math.floor(Math.random() * this.names.length) + this.names.length;
       for (let i = 0; i < rotations; i++) {
         setTimeout(() => {
           this.shiftNames();
+          // Nach dem letzten Shift: auf freie Rotation-ID stellen
+          if (i === rotations - 1) {
+            // Finde nächste freie Rotation-ID
+            let tries = 0;
+            const maxTries = this.names.length - 1;
+            while (this.usedRotationIds.includes(this.rotationId) && tries < maxTries) {
+              this.increaseRotationId();
+              tries++;
+            }
+            localStorage.setItem('rotationId', this.rotationId);
+          }
         }, (Math.pow(Math.tan((i/rotations)), 2) + Math.tan((i/rotations))) * 500);
       }
     },
@@ -177,13 +203,6 @@ export default {
       localStorage.setItem('usedRotationIds', JSON.stringify(this.usedRotationIds));
       localStorage.setItem('rotationId', this.rotationId);
       this.showPopup = false;
-      // Nach dem Setzen: Namen entsprechend rotationId rotieren
-      for (let i = 0; i < this.rotationId; i++) {
-        if (this.names.length > 1) {
-          const lastItem = this.names.pop();
-          this.names.splice(1, 0, lastItem);
-        }
-      }
     },
     saveSidebarText() {
       localStorage.setItem('sidebarText', this.sidebarText);
@@ -225,6 +244,10 @@ export default {
     },
     formatName(name) {
       return name.replace(/ /g, '<br>');
+    },
+    setRotationId(id) {
+      this.rotationId = id;
+      localStorage.setItem('rotationId', this.rotationId);
     }
   },
   mounted() {
@@ -236,13 +259,8 @@ export default {
     if (storedRotationId !== null) {
       this.rotationId = parseInt(storedRotationId, 10);
     }
-    // Nach dem Laden: Namen entsprechend rotationId rotieren
-    for (let i = 0; i < this.rotationId; i++) {
-      if (this.names.length > 1) {
-        const lastItem = this.names.pop();
-        this.names.splice(1, 0, lastItem);
-      }
-    }
+    // Namen aus LocalStorage laden (immer Grundreihenfolge)
+    this.names = JSON.parse(localStorage.getItem('names')) || [];
   }
 };
 </script>
@@ -367,6 +385,28 @@ textarea {
   margin: 0 0 14px 16px;
   font-weight: 700;
   letter-spacing: 1px;
+}
+.used-rotation-ids {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: 8px;
+  margin: 10px 0 0 10px;
+}
+.used-rotation-ids button {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+  transition: background 0.2s;
+}
+.used-rotation-ids button.active {
+  /* keine grüne Hervorhebung mehr */
 }
 </style>
 

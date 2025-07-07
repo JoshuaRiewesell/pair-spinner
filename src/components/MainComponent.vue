@@ -27,15 +27,16 @@
     </div>
     <div class="center">
       <div>
-        <button @click="showPopup = true">&#9998;</button>
+        <button @click="openNamesPopup">&#9998;</button>
         <button :class="{ used: rotationIdIsUsed }" @click="toggleUsedRotationId">{{ rotationId }}</button>
         <button @click="spin">&#8634;</button>
       </div>
 
       <div v-if="showPopup" class="popup" @click="showPopup = false">
-        <div class="popup-content" @click="(e) => e.stopPropagation()">
-          <h3>Namen</h3>
-          <textarea v-model="namesInput" placeholder="Trenne die Namen mit Kommas und/oder Absätzen"></textarea>
+        <div class="popup-content large" @click="(e) => e.stopPropagation()">
+          <h3>Namen</h3><br />
+          <p>Änderungen setzen den Speicher zurück!</p>
+          <textarea v-model="namesInput" class="large-textarea" placeholder="Trenne die Namen mit Kommas und/oder Absätzen"></textarea>
           <div class="popup-buttons">
             <button @click="showPopup = false">X</button>
             <button @click="submitNames">&#10003;</button>
@@ -136,6 +137,10 @@ export default {
     }
   },
   methods: {
+    openNamesPopup() {
+      this.namesInput = this.names.join('\n');
+      this.showPopup = true;
+    },
     increaseRotationId() {
       if (this.names.length < 2) return;
       this.rotationId = (this.rotationId + 1) % (this.names.length - 1);
@@ -342,6 +347,22 @@ button.used {
   border-radius: 8px;
   width: 300px;
   text-align: center;
+}
+.popup-content.large {
+  width: 350px;
+  min-height: 500px;
+  max-height: 90vh;
+  overflow: auto;
+  padding: 0 20px 10px 20px;
+}
+.large-textarea {
+  width: calc(100% - 4px);
+  height: 350px;
+  font-size: 20px;
+  resize: vertical;
+  overflow-y: auto;
+  box-sizing: border-box;
+  margin: 0 auto 16px auto;
 }
 textarea {
   resize: none;
